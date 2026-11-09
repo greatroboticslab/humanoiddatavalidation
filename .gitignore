@@ -1,0 +1,25 @@
+# Settings with keys and server addresses (copy .env.example to .env)
+.env
+.env.*
+!.env.example
+*cookies*.txt
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+
+# Created at run time: downloads, frames, transcripts, results, reviews
+work/
+
+# Output: corrected task files and reports, rebuilt by "python -m validator report"
+output/
+
+# Editors and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log

@@ -1,0 +1,22 @@
+These ${n} frames are taken in order from ${start}-${end} of a YouTube video titled "${title}".
+Speech in the same time range (${speech_source}):
+  "${speech}"
+
+The dataset says this is what happens in that time range:
+  "${text}"
+
+Using BOTH the frames and the speech, decide whether the task happens in this part of the video.
+  YES    = the task's content is shown and/or said here. It is enough that it happens in part of the range; other
+           things may happen too. Paraphrase is fine, and the task's verb ("observe", "describe", "note", "mention")
+           does not matter: a task that says "observe X" matches if X is said, and "explain X" matches if X is shown.
+  PARTLY = related, but a specific fact in the task is different or missing here (a different crop, tool, number,
+           name, place or step), or only part of what the task describes happens here.
+  NO     = what is shown and said here is about something else.
+Be strict about facts and lenient about wording. Do not judge whether the task is a good task; only whether it
+matches what is going on here.
+
+Reply with ONE JSON object:
+{"match": "YES | PARTLY | NO",
+ "what_is_happening": "one sentence: what is shown and said in this time range",
+ "issue": "if not YES: what does not match; otherwise empty",
+ "correct_task": "if not YES: the task rewritten so it matches what is going on here, in the same style as the dataset; otherwise empty"}

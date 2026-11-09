@@ -1,0 +1,8 @@
+These ${n} frames are taken in order from ${start}-${end} of a YouTube video titled "${title}".
+Speech in the same time range: "${speech}"
+
+The dataset says this happens here: "${text}"
+It does not match: ${issue}
+
+Rewrite the task so it matches what is going on in this time range (what is shown and said), in the same style as
+the dataset's task. Reply with ONE JSON object: {"correct_task": "..."}

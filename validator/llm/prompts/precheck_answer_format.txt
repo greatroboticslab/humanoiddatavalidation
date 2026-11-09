@@ -1,0 +1,12 @@
+Return JSON with this shape:
+{
+ "content_match": "MATCH | PARTIAL | MISMATCH | UNVERIFIABLE",
+ "about_farming": true|false,
+ "dataset_title_matches_video": true|false,
+ "problems": [{"task_index": int|null,
+               "type": "wrong_content | unverified_detail | wrong_timestamp | wrong_title | other",
+               "issue": "short description",
+               "correct_task": "REQUIRED: the task rewritten so it matches this video (for wrong_title: the correct dataset title)"}],
+ "summary": "one or two sentences"
+}
+Every problem MUST have a correct_task, written in the same style as the dataset's tasks.

@@ -1,0 +1,3 @@
+These ${n} frames are spread evenly across a whole YouTube video titled "${title}" (${length} long).
+Reply with ONE JSON object:
+{"description": "one or two sentences: what the video shows overall"}

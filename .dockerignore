@@ -1,0 +1,15 @@
+# Only the code goes into the image; settings, data and results are mounted at run time (see docker-compose.yml).
+.env
+.env.*
+*cookies*.txt
+.git/
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+work/
+data/
+output/
+scripts/
+*.pdf
+*.bat

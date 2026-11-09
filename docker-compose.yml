@@ -1,0 +1,78 @@
+# MTSU Task Validation on Linux (or anywhere Docker runs). This one file builds and runs everything.
+#
+#   1. cp .env.example .env      then fill in the LLM_* settings
+#   2. docker compose up -d      the first start builds the image (a few minutes)
+#   3. open http://localhost:8765, or http://<this machine's address>:8765 from another computer
+#
+#   Stop:  docker compose down        Logs:  docker compose logs -f
+#   After updating the code:          docker compose up -d --build
+#   Command line inside the container: docker compose exec dashboard python -m validator validate --sample 20
+#
+# Corrected tasks and reports go to ./output, working files to ./work. Needs Docker Compose v2.24 or newer.
+
+name: mtsu-validation
+
+services:
+  dashboard:
+    image: mtsu-validation:latest
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM python:3.12-slim-bookworm
+        # ffmpeg cuts frames and audio; deno lets yt-dlp answer YouTube's JavaScript checks
+        RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg && rm -rf /var/lib/apt/lists/*
+        COPY --from=denoland/deno:bin-2.9.8 /deno /usr/local/bin/deno
+        WORKDIR /app
+        COPY requirements.txt .
+        RUN pip install --no-cache-dir -r requirements.txt
+        COPY validator ./validator
+        COPY dashboard ./dashboard
+        COPY tests ./tests
+        ENV PYTHONUNBUFFERED=1 PYTHONIOENCODING=utf-8 IMAGEIO_FFMPEG_EXE=/usr/bin/ffmpeg HOME=/tmp
+        EXPOSE 8765
+
+    # LLM settings, Whisper model, etc. come from .env
+    env_file:
+      - path: .env
+        required: false
+
+    environment:
+      TRANSCRIPTS_DIR: ${TRANSCRIPTS_DIR:+/data/transcripts}
+      YT_COOKIES: ${YT_COOKIES:+/data/cookies.txt}
+      DASHBOARD_HOST: 0.0.0.0
+      DASHBOARD_PORT: "8765"
+      HF_HOME: /app/work/huggingface
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+
+    volumes:
+      - ./data:/app/data:ro                                            # task files, read only
+      - ./work:/app/work
+      - ./output:/app/output
+      - ${TRANSCRIPTS_DIR:-./work/.unused}:/data/transcripts:ro         # optional
+      - ${YT_COOKIES:-/dev/null}:/data/cookies.txt:ro                   # optional
+
+    ports:
+      # Reachable from other computers on the network. For this machine only, use
+      # "127.0.0.1:${DASHBOARD_PORT:-8765}:8765" instead.
+      - "${DASHBOARD_PORT:-8765}:8765"
+
+    # lets LLM_URL use http://host.docker.internal:<port>/... for an LLM server on this same machine
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    # Starts as root only to give ./output and ./work to PUID:PGID (your user), then runs the dashboard as that user.
+    command:
+      - sh
+      - -c
+      - |
+        chown -R "$$PUID:$$PGID" /app/output /app/work
+        exec setpriv --reuid="$$PUID" --regid="$$PGID" --clear-groups python dashboard/app.py
+
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8765/api/settings', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+
+    restart: unless-stopped
