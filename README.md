@@ -7,6 +7,8 @@ the validations and lets you review the results while watching the videos.
 
 The task files are in `data/`, one `<video_id>.json` per video.
 
+![Dataset tab](docs/screenshots/01-dataset.png)
+
 ## Quick start
 
 ### Windows
@@ -76,6 +78,53 @@ If YouTube asks this computer to slow down ("confirm you're not a bot"), the job
 
 Command line: `python -m validator validate --sample 20` (see `validator/README.md`).
 
+## Screenshots
+
+### Dataset
+
+Every video in `data/` as a card with its verdict badge, task and subtask counts. Filter, search by title or ID, and
+see how much disk the downloaded videos use (**Local storage**).
+
+![Dataset tab](docs/screenshots/01-dataset.png)
+
+### Selecting videos to validate
+
+Tick cards (or use **Select page**, **20-video sample**, **Random 20**). The bar at the bottom starts the
+validation (**Validate N**), with options to re-validate or delete the videos afterwards, and exports the selection
+as CSV.
+
+![Dataset with three videos selected](docs/screenshots/02-dataset-selected.png)
+
+### Video page
+
+Click a card to open a video: the YouTube player, the dataset title, the **Validation** panel (verdict and
+**Validate** / **Re-validate** button) and **Your review** (does the task list make sense? plus notes).
+
+![Video page](docs/screenshots/03-video-detail.png)
+
+### Opening a task
+
+Below the player is the **Task Tree**: every task (T1, T2, …) with its subtasks and their time ranges. Clicking a
+timestamp highlights that subtask and plays that moment in the player (here subtask 2.2 at 0:26). Use ✓ / ✗ to
+mark each task or subtask as right or wrong. After validation, each subtask also shows its frames, what was said,
+the match result (green / amber / red) and the suggested correction with **Use as correction**.
+
+![Task tree with subtask 2.2 opened](docs/screenshots/04-task-opened.png)
+
+### Jobs
+
+Validations run here in the background, two videos at a time. Each job shows its status (queued, running, done,
+failed) and can be cancelled, retried or removed; jobs continue after a restart.
+
+![Jobs tab](docs/screenshots/05-jobs.png)
+
+### How it works
+
+A built-in page with the full validation flow: the evidence collected, what the LLM decides, how the verdict is
+computed, and what each verdict and per-subtask result means.
+
+![How it works tab](docs/screenshots/06-how-it-works.png)
+
 ## Project layout
 
 ```
@@ -92,6 +141,7 @@ validator/             the validation engine (see validator/README.md)
   llm/                   LLM client, one provider per API, and every prompt
 dashboard/             web dashboard: Flask app.py + static/ (HTML, CSS, JavaScript)
 tests/                 offline tests and planted-error self-tests (with their latest results)
+docs/screenshots/      dashboard screenshots used in this README
 scripts/               stop_dashboard.ps1
 work/                  working files: downloads, frames, transcripts, intermediate results, reviews (not in git)
 ```
